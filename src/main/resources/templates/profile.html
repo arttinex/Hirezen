@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Profile · Hirezen</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+    <h1>My Profile</h1>
+
+    <div class="profile-view">
+        <div class="profile-row">
+            <span class="profile-label">Name</span>
+            <span th:text="${user.name}">Jane Doe</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Email</span>
+            <span th:text="${user.email}">jane@example.com</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Phone</span>
+            <span th:text="${profile.phone} ?: 'Not set'">Not set</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Location</span>
+            <span th:text="${profile.location} ?: 'Not set'">Not set</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Bio</span>
+            <span th:text="${profile.bio} ?: 'No bio yet.'">No bio yet.</span>
+        </div>
+        <div class="profile-row">
+            <span class="profile-label">Skills</span>
+            <div class="skills-tags" th:if="${profile.skills}">
+                <span class="skill-tag" th:each="skill : ${#strings.arraySplit(profile.skills, ',')}"
+                      th:text="${#strings.trim(skill)}">Skill</span>
+            </div>
+            <span th:unless="${profile.skills}">Not set</span>
+        </div>
+    </div>
+
+    <a th:href="@{/profile/edit}" class="btn-primary" style="display:inline-block; width:auto;">Edit Profile</a>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

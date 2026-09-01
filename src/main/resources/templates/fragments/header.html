@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header class="dash-header" th:fragment="dash-header(roleLabel)">
+    <span class="brand">Hirezen</span>
+
+    <nav class="app-nav">
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/jobs}">Jobs</a>
+        <a th:href="@{/gigs}">Gigs</a>
+        <a th:href="@{/messages}">Connect</a>
+        <a th:href="@{/pulse}">Pulse</a>
+        <a th:href="@{/campus}">Campus</a>
+        <a th:href="@{/zenai}">ZenAI</a>
+    </nav>
+
+    <div class="dash-header-actions">
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">
+            <span data-theme-icon>&#9789;</span>
+        </button>
+
+        <div class="profile-menu" data-profile-menu>
+            <button type="button" class="profile-menu-trigger" data-profile-menu-trigger>
+                <span>Profile</span>
+                <span class="role-badge" th:text="${roleLabel}">Role</span>
+            </button>
+            <div class="profile-menu-dropdown">
+                <div class="signed-in-as">
+                    Signed in as<br>
+                    <strong sec:authentication="name">user@example.com</strong>
+                </div>
+                <a th:href="@{/profile}">View Profile</a>
+                <a th:href="@{/profile/edit}">Edit Profile</a>
+                <a th:href="@{/profile}">Resume / CV</a>
+                <a th:href="@{/profile}">Portfolio</a>
+                <a th:href="@{/profile}">Skills</a>
+                <a th:href="@{/profile}">Settings</a>
+                <div class="divider"></div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="logout-item">Logout</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

@@ -1,0 +1,424 @@
+:root {
+    --color-bg: #f4f6f8;
+    --color-surface: #ffffff;
+    --color-primary: #2454ff;
+    --color-primary-dark: #1a3fd6;
+    --color-text: #1c2333;
+    --color-muted: #667085;
+    --color-border: #e3e7ee;
+    --color-error: #d92d20;
+    --color-success: #12793f;
+    --radius: 10px;
+    --speed: 160ms;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/*
+   Dark mode - every rule in this file already reads colors from the
+   variables above, so switching them here is enough to re-theme the
+   entire site. No other selector needs to know about dark mode at all.
+*/
+html[data-theme="dark"] {
+    --color-bg: #12141a;
+    --color-surface: #1b1e26;
+    --color-primary: #6d8bff;
+    --color-primary-dark: #8ba0ff;
+    --color-text: #e7e9ee;
+    --color-muted: #9aa1b1;
+    --color-border: #2c3040;
+    --color-error: #ff8a80;
+    --color-success: #5fd897;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* ---------- Auth pages (signup / signin) ---------- */
+
+.auth-page {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-page .theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.auth-card h1 {
+    font-size: 22px;
+    margin: 0 0 4px;
+}
+
+.auth-card .subtitle {
+    color: var(--color-muted);
+    font-size: 14px;
+    margin: 0 0 24px;
+}
+
+.field {
+    margin-bottom: 16px;
+}
+
+.field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.field input,
+.field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.field input:focus,
+.field select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-primary:hover { background: var(--color-primary-dark); }
+
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: var(--color-muted);
+}
+
+.auth-footer a { color: var(--color-primary); text-decoration: none; }
+.auth-footer a:hover { text-decoration: underline; }
+
+.alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.alert-error { background: #fef3f2; color: var(--color-error); border: 1px solid #fee4e2; }
+.alert-success { background: #ecfdf3; color: var(--color-success); border: 1px solid #d1fadf; }
+
+/* ---------- Dashboard shell ---------- */
+
+.dash-header {
+    display: flex;
+    align-items: center;
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0 24px;
+}
+
+.dash-header .brand {
+    font-weight: 700;
+    font-size: 16px;
+    padding: 16px 20px 16px 0;
+    white-space: nowrap;
+}
+
+.app-nav {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+}
+
+.app-nav a {
+    flex: 1;
+    text-align: center;
+    padding: 18px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-muted);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: color var(--speed) var(--ease), border-color var(--speed) var(--ease);
+}
+
+.app-nav a:hover {
+    color: var(--color-text);
+    border-bottom-color: var(--color-border);
+}
+
+.app-nav a.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+}
+
+.dash-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 16px;
+}
+
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color var(--speed) var(--ease);
+}
+.theme-toggle:hover { background: var(--color-bg); }
+
+/* ---------- Profile dropdown ---------- */
+
+.profile-menu {
+    position: relative;
+}
+
+/* ---------- Profile view/edit pages ---------- */
+
+.profile-view {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 8px 24px;
+    margin-bottom: 24px;
+    max-width: 640px;
+}
+
+.profile-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.profile-row:last-child {
+    border-bottom: none;
+}
+
+.profile-label {
+    flex: 0 0 140px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-muted);
+    padding-top: 2px;
+}
+
+.profile-row > span:not(.profile-label) {
+    flex: 1;
+    font-size: 14px;
+}
+
+.skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-tag {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: #eaefff;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+html[data-theme="dark"] .skill-tag { background: rgba(109, 139, 255, 0.18); }
+
+.profile-form {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 28px;
+    max-width: 480px;
+}
+
+.profile-form .btn-primary {
+    width: auto;
+    padding: 10px 24px;
+}
+
+/* .field already styles input/select from the auth pages - textarea needs
+   the same treatment added explicitly since it wasn't in the original selector. */
+.field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.field textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+.profile-menu-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+.profile-menu-trigger:hover { background: var(--color-bg); }
+
+.profile-menu-trigger .role-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-primary);
+    background: #eaefff;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+}
+html[data-theme="dark"] .profile-menu-trigger .role-badge { background: rgba(109, 139, 255, 0.18); }
+
+.profile-menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    min-width: 220px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(16, 24, 40, 0.14);
+    padding: 8px;
+    z-index: 20;
+}
+
+.profile-menu.open .profile-menu-dropdown { display: block; }
+
+.profile-menu-dropdown .signed-in-as {
+    padding: 8px 10px 10px;
+    font-size: 12px;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 6px;
+    word-break: break-all;
+}
+
+.profile-menu-dropdown a,
+.profile-menu-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 9px 10px;
+    border-radius: 6px;
+    border: none;
+    background: none;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--color-text);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.profile-menu-dropdown a:hover,
+.profile-menu-dropdown button:hover {
+    background: var(--color-bg);
+}
+
+.profile-menu-dropdown .divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 6px 0;
+}
+
+.profile-menu-dropdown .logout-item {
+    color: var(--color-error);
+}
+
+.btn-logout {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+.btn-logout:hover { background: #f4f6f8; }
+
+.dash-content { padding: 32px; max-width: 1100px; margin: 0 auto; }
+.dash-content h1 { font-size: 24px; margin: 0 0 6px; }
+.dash-content .lead { color: var(--color-muted); margin: 0 0 20px; }
+.dash-actions { margin-bottom: 24px; }
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+}
+
+.stat-card .value { font-size: 26px; font-weight: 700; }
+.stat-card .label { font-size: 13px; color: var(--color-muted); margin-top: 4px; }
+
+.coming-soon {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 48px 32px;
+    text-align: center;
+    max-width: 480px;
+    margin: 40px auto 0;
+}
+.coming-soon h1 { margin: 0 0 8px; }
+.coming-soon .lead { margin: 0 0 20px; }

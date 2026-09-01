@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<header class="dash-header" th:fragment="dash-header(roleLabel)">
+    <div>
+        <span class="brand">Hirezen</span>
+        <span class="role-badge" th:text="${roleLabel}">Role</span>
+    </div>
+    <div class="user-info">
+        <span>Signed in as <strong sec:authentication="name">user@example.com</strong></span>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+            <button type="submit" class="btn-logout">Sign Out</button>
+        </form>
+    </div>
+</header>
+
+</body>
+</html>

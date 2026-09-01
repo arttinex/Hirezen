@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${roleLabel} + ' Dashboard \u00b7 Hirezen'">Dashboard</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+    <h1 th:text="${roleLabel} + ' Dashboard'">Dashboard</h1>
+
+    <!--
+        Role-specific copy is the ONLY thing that branches here - the
+        stats grid below is completely generic and works identically for
+        all three roles.
+    -->
+    <p class="lead" sec:authorize="hasRole('ADMIN')">Platform-wide overview.</p>
+    <p class="lead" sec:authorize="hasRole('RECRUITER')">Manage your job postings and applicants.</p>
+    <p class="lead" sec:authorize="hasRole('JOB_SEEKER')">Track your applications, interviews, and saved jobs.</p>
+
+    <!--
+        Role-specific quick actions - again, small and isolated, not a
+        fork of the whole page. Links point at routes that don't exist
+        yet; they'll be wired up once Job/Application are built.
+    -->
+    <div class="dash-actions" sec:authorize="hasRole('RECRUITER')">
+        <a th:href="@{/jobs/new}" class="btn-primary" style="display:inline-block; width:auto;">Post a Job</a>
+    </div>
+    <div class="dash-actions" sec:authorize="hasRole('JOB_SEEKER')">
+        <a th:href="@{/jobs}" class="btn-primary" style="display:inline-block; width:auto;">Browse Jobs</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card" th:each="card : ${stats}">
+            <div class="value" th:text="${card.value()}">0</div>
+            <div class="label" th:text="${card.label()}">Label</div>
+        </div>
+    </div>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

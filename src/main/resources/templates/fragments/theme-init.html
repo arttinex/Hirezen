@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+    Include this in <head>, before the stylesheet link, on every page.
+    Runs synchronously (no defer/async) so the correct theme is applied
+    before the browser paints anything - without this, a saved dark-mode
+    preference would flash light for a moment on every page load.
+-->
+<th:block th:fragment="init">
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem("hirezen-theme") || "light";
+                document.documentElement.setAttribute("data-theme", saved);
+            } catch (e) { /* localStorage unavailable - fall back to light, no crash */ }
+        })();
+    </script>
+</th:block>
+
+</body>
+</html>
