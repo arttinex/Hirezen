@@ -32,4 +32,10 @@ public class Profile {
 
     /** Public URL path to the uploaded photo, e.g. /uploads/profile-images/user-3-1699999999.jpg */
     private String imageUrl;
+
+    /** Public URL path to the uploaded resume/CV file, e.g. /uploads/resumes/user-3-1699999999.pdf */
+    private String resumeUrl;
+
+    /** Original filename of the uploaded resume - shown as the download/view label instead of the disk filename. */
+    private String resumeFileName;
 }

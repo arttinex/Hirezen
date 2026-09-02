@@ -37,6 +37,36 @@ public class JobService {
         return saved;
     }
 
+    /**
+     * Updates an existing job's editable fields. Ownership (only the
+     * recruiter who posted it can edit) is checked in JobController before
+     * this is called, not here.
+     */
+    @Transactional
+    public Job updateJob(Job job, String title, String description, String companyName,
+                          String location, EmploymentType employmentType) {
+        job.setTitle(title.trim());
+        job.setDescription(description.trim());
+        job.setCompanyName(companyName.trim());
+        job.setLocation(location.trim());
+        job.setEmploymentType(employmentType);
+        return jobRepository.save(job);
+    }
+
+    /** Ownership is checked in JobController before this is called. */
+    @Transactional
+    public void deleteJob(Job job) {
+        jobRepository.delete(job);
+        log.info("Job deleted: '{}' at {}", job.getTitle(), job.getCompanyName());
+    }
+
+    /** Marks the job filled - it stops appearing in the seeker-facing Browse Jobs list (which only shows OPEN). */
+    @Transactional
+    public Job markAsHired(Job job) {
+        job.setStatus(JobStatus.HIRED);
+        return jobRepository.save(job);
+    }
+
     /** All open jobs, newest first - what job seekers browse. */
     public List<Job> openJobs() {
         return jobRepository.findByStatusOrderByCreatedAtDesc(JobStatus.OPEN);

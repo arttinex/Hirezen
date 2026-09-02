@@ -19,7 +19,8 @@ import java.nio.file.Paths;
 @Slf4j
 public class ProfileService {
 
-    private static final String UPLOAD_DIR = "uploads/profile-images";
+    private static final String IMAGE_DIR = "uploads/profile-images";
+    private static final String RESUME_DIR = "uploads/resumes";
 
     private final ProfileRepository profileRepository;
 
@@ -31,7 +32,8 @@ public class ProfileService {
     }
 
     @Transactional
-    public Profile update(User user, String bio, String phone, String location, String skills, MultipartFile image) {
+    public Profile update(User user, String bio, String phone, String location, String skills,
+                           MultipartFile image, MultipartFile resume) {
         Profile profile = getOrCreate(user);
         profile.setBio(bio);
         profile.setPhone(phone);
@@ -40,7 +42,7 @@ public class ProfileService {
 
         if (image != null && !image.isEmpty()) {
             try {
-                profile.setImageUrl(storeImage(user, image));
+                profile.setImageUrl(storeFile(IMAGE_DIR, user, image));
             } catch (IOException ex) {
                 // Don't fail the whole save just because the photo didn't upload -
                 // the text fields the user typed are still worth keeping.
@@ -48,18 +50,27 @@ public class ProfileService {
             }
         }
 
+        if (resume != null && !resume.isEmpty()) {
+            try {
+                profile.setResumeUrl(storeFile(RESUME_DIR, user, resume));
+                profile.setResumeFileName(resume.getOriginalFilename());
+            } catch (IOException ex) {
+                log.warn("Failed to store resume for user {}: {}", user.getEmail(), ex.getMessage());
+            }
+        }
+
         return profileRepository.save(profile);
     }
 
-    private String storeImage(User user, MultipartFile image) throws IOException {
-        Path dir = Paths.get(UPLOAD_DIR);
+    private String storeFile(String directory, User user, MultipartFile file) throws IOException {
+        Path dir = Paths.get(directory);
         Files.createDirectories(dir);
 
-        String filename = "user-" + user.getId() + "-" + System.currentTimeMillis() + extensionOf(image.getOriginalFilename());
+        String filename = "user-" + user.getId() + "-" + System.currentTimeMillis() + extensionOf(file.getOriginalFilename());
         Path target = dir.resolve(filename);
-        image.transferTo(target);
+        file.transferTo(target);
 
-        return "/uploads/profile-images/" + filename;
+        return "/" + directory + "/" + filename;
     }
 
     private String extensionOf(String originalFilename) {

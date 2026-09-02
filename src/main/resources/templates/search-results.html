@@ -27,7 +27,10 @@
                     <span class="hirezen-id-badge" th:text="${u.hirezenId}">HZS1</span>
                 </div>
                 <p class="job-meta" th:text="${u.role}">JOB_SEEKER</p>
-                <a th:href="@{/messages/{id}(id=${u.id})}" style="display:inline-block; margin-top:6px; font-size:13px;">Message</a>
+                <div style="margin-top:6px; display:flex; gap:14px;">
+                    <a th:href="@{/profile/{id}(id=${u.id})}" style="font-size:13px;">View Profile</a>
+                    <a th:href="@{/messages/{id}(id=${u.id})}" style="font-size:13px;">Message</a>
+                </div>
             </div>
         </div>
         <p th:if="${#lists.isEmpty(matchedUsers)}" class="lead" style="margin-bottom:28px;">No people matched.</p>

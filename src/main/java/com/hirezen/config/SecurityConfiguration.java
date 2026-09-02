@@ -24,8 +24,10 @@ public class SecurityConfiguration {
                         .requestMatchers("/dashboard/recruiter/**").hasRole("RECRUITER")
                         .requestMatchers("/dashboard/job-seeker/**").hasRole("JOB_SEEKER")
                         .requestMatchers("/dashboard").authenticated()
-                        // Posting/managing jobs and viewing applicants is recruiter-only.
-                        .requestMatchers("/jobs/new", "/jobs/mine", "/jobs/*/applicants").hasRole("RECRUITER")
+                        // Posting, editing, deleting, hiring, and viewing applicants is recruiter-only.
+                        // Per-job ownership (this recruiter posted THIS job) is still checked in JobController.
+                        .requestMatchers("/jobs/new", "/jobs/mine", "/jobs/*/applicants",
+                                          "/jobs/*/edit", "/jobs/*/delete", "/jobs/*/hire").hasRole("RECRUITER")
                         // Applying and viewing your own applications is seeker-only.
                         .requestMatchers("/jobs/*/apply", "/applications").hasRole("JOB_SEEKER")
                         // Browsing (/jobs itself) stays open to any authenticated user.

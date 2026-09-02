@@ -80,4 +80,10 @@ public class ApplicationService {
     public long totalApplicationsCount() {
         return applicationRepository.count();
     }
+
+    /** Called before a job is deleted - applications referencing it must be removed first to satisfy the FK constraint. */
+    @Transactional
+    public void deleteAllForJob(Job job) {
+        applicationRepository.deleteByJob(job);
+    }
 }

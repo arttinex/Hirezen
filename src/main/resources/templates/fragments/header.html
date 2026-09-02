@@ -8,7 +8,9 @@
 
     <nav class="app-nav" data-app-nav>
         <a th:href="@{/dashboard}">Dashboard</a>
-        <a th:href="@{/jobs}">Jobs</a>
+        <!-- Recruiters manage their own postings here; everyone else browses open jobs. -->
+        <a sec:authorize="hasRole('RECRUITER')" th:href="@{/jobs/mine}">Jobs</a>
+        <a sec:authorize="!hasRole('RECRUITER')" th:href="@{/jobs}">Jobs</a>
         <a th:href="@{/gigs}">Gigs</a>
         <a th:href="@{/messages}">Connect</a>
         <a th:href="@{/pulse}">Pulse</a>
