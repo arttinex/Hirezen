@@ -32,7 +32,10 @@
             <p class="job-meta" th:text="'Applied ' + ${#temporals.format(app.appliedAt, 'MMM d, yyyy')}">
                 Applied on
             </p>
-            <a th:href="@{/messages/{id}(id=${app.seeker.id})}" style="display:inline-block; margin-top:8px; font-size:13px;">Message</a>
+            <div style="margin-top:8px; display:flex; gap:14px;">
+                <a th:href="@{/profile/{id}(id=${app.seeker.id})}" style="font-size:13px;">View Profile</a>
+                <a th:href="@{/messages/{id}(id=${app.seeker.id})}" style="font-size:13px;">Message</a>
+            </div>
         </div>
     </div>
 

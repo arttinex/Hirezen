@@ -33,8 +33,6 @@ public class JobController {
         model.addAttribute("jobs", jobService.openJobs());
         model.addAttribute("roleLabel", roleLabel(user));
 
-        // Only job seekers need to know which jobs they've already applied to
-        // (drives the "Applied" vs "Apply" state of the button in the template).
         if (user.getRole() == Role.JOB_SEEKER) {
             model.addAttribute("appliedJobIds", applicationService.appliedJobIds(user));
         }
@@ -71,7 +69,6 @@ public class JobController {
         User recruiter = userService.findByEmail(authentication.getName());
         List<Job> jobs = jobService.jobsPostedBy(recruiter);
 
-        // Applicant count per job, shown as "View Applicants (n)" on each card.
         Map<Long, Long> applicantCounts = new HashMap<>();
         for (Job job : jobs) {
             applicantCounts.put(job.getId(), applicationService.countForJob(job));
@@ -81,6 +78,71 @@ public class JobController {
         model.addAttribute("applicantCounts", applicantCounts);
         model.addAttribute("roleLabel", roleLabel(recruiter));
         return "jobs-mine";
+    }
+
+    /** Restricted to RECRUITER in SecurityConfiguration; ownership is still checked here. */
+    @GetMapping("/{id}/edit")
+    public String editJobForm(@PathVariable Long id, Authentication authentication, Model model) {
+        User recruiter = userService.findByEmail(authentication.getName());
+        Job job = jobService.findById(id);
+
+        if (!job.getPostedBy().getId().equals(recruiter.getId())) {
+            return "redirect:/jobs/mine";
+        }
+
+        model.addAttribute("job", job);
+        model.addAttribute("employmentTypes", EmploymentType.values());
+        model.addAttribute("roleLabel", roleLabel(recruiter));
+        return "job-edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateJob(
+            @PathVariable Long id,
+            Authentication authentication,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam String companyName,
+            @RequestParam String location,
+            @RequestParam EmploymentType employmentType) {
+
+        User recruiter = userService.findByEmail(authentication.getName());
+        Job job = jobService.findById(id);
+
+        if (!job.getPostedBy().getId().equals(recruiter.getId())) {
+            return "redirect:/jobs/mine";
+        }
+
+        jobService.updateJob(job, title, description, companyName, location, employmentType);
+        return "redirect:/jobs/mine";
+    }
+
+    /** Deletes the job and any applications against it (a job can't be deleted while applications still reference it). */
+    @PostMapping("/{id}/delete")
+    public String deleteJob(@PathVariable Long id, Authentication authentication) {
+        User recruiter = userService.findByEmail(authentication.getName());
+        Job job = jobService.findById(id);
+
+        if (!job.getPostedBy().getId().equals(recruiter.getId())) {
+            return "redirect:/jobs/mine";
+        }
+
+        applicationService.deleteAllForJob(job);
+        jobService.deleteJob(job);
+        return "redirect:/jobs/mine";
+    }
+
+    @PostMapping("/{id}/hire")
+    public String markHired(@PathVariable Long id, Authentication authentication) {
+        User recruiter = userService.findByEmail(authentication.getName());
+        Job job = jobService.findById(id);
+
+        if (!job.getPostedBy().getId().equals(recruiter.getId())) {
+            return "redirect:/jobs/mine";
+        }
+
+        jobService.markAsHired(job);
+        return "redirect:/jobs/mine";
     }
 
     private String roleLabel(User user) {

@@ -52,6 +52,14 @@
                    placeholder="Java, Spring Boot, SQL (comma-separated)">
         </div>
 
+        <div class="field">
+            <label for="resume">Resume / CV</label>
+            <a th:if="${profile.resumeUrl}" th:href="${profile.resumeUrl}" target="_blank" rel="noopener"
+               style="display:block; margin-bottom:8px; font-size:13px;"
+               th:text="'Current file: ' + (${profile.resumeFileName} ?: 'view')">Current file</a>
+            <input type="file" id="resume" name="resume" accept=".pdf,.doc,.docx">
+        </div>
+
         <button type="submit" class="btn-primary">Save Changes</button>
     </form>
 

@@ -50,9 +50,18 @@
             </div>
             <span th:unless="${profile.skills}">Not set</span>
         </div>
+        <div class="profile-row">
+            <span class="profile-label">Resume / CV</span>
+            <a th:if="${profile.resumeUrl}" th:href="${profile.resumeUrl}" target="_blank" rel="noopener"
+               th:text="${profile.resumeFileName} ?: 'View Resume'">View Resume</a>
+            <span th:unless="${profile.resumeUrl}">Not uploaded</span>
+        </div>
     </div>
 
-    <a th:href="@{/profile/edit}" class="btn-primary" style="display:inline-block; width:auto;">Edit Profile</a>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a th:if="${isOwnProfile}" th:href="@{/profile/edit}" class="btn-primary" style="display:inline-block; width:auto;">Edit Profile</a>
+        <a th:unless="${isOwnProfile}" th:href="@{/messages/{id}(id=${user.id})}" class="btn-primary" style="display:inline-block; width:auto;">Message</a>
+    </div>
 
 </div>
 </main>

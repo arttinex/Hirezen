@@ -22,7 +22,7 @@
         <div class="job-card" th:each="job : ${jobs}">
             <div class="job-card-header">
                 <h3 th:text="${job.title}">Job Title</h3>
-                <span class="job-status-badge" th:classappend="${job.status.name() == 'OPEN'} ? 'status-open' : 'status-closed'"
+                <span class="job-status-badge" th:classappend="'status-' + ${#strings.toLowerCase(job.status.name())}"
                       th:text="${job.status}">OPEN</span>
             </div>
             <p class="job-meta" th:text="${job.companyName} + ' · ' + ${job.location} + ' · ' + ${job.employmentType.label()}">
@@ -33,6 +33,20 @@
             <a th:href="@{/jobs/{id}/applicants(id=${job.id})}" style="display:inline-block; margin-top:14px; font-size:14px;">
                 View Applicants (<span th:text="${applicantCounts.get(job.id)}">0</span>)
             </a>
+
+            <div class="job-actions">
+                <a th:href="@{/jobs/{id}/edit(id=${job.id})}" class="btn-secondary">Edit</a>
+
+                <form th:if="${job.status.name() == 'OPEN'}" th:action="@{/jobs/{id}/hire(id=${job.id})}" method="post"
+                      style="display:inline;">
+                    <button type="submit" class="btn-secondary">Mark as Hired</button>
+                </form>
+
+                <form th:action="@{/jobs/{id}/delete(id=${job.id})}" method="post" style="display:inline;"
+                      onsubmit="return confirm('Delete this job posting? This also removes all applications against it. This cannot be undone.');">
+                    <button type="submit" class="btn-danger">Delete</button>
+                </form>
+            </div>
         </div>
     </div>
 
