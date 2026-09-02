@@ -19,6 +19,14 @@
 
     <properties>
         <java.version>25</java.version>   <!-- was 17 -->
+        <!--
+            Spring Boot 3.5.5's managed Lombok version predates JDK 25 support
+            (added in Lombok 1.18.40, Sept 2025) - without this override,
+            Lombok silently fails to generate any getters/setters/builders/
+            @Slf4j loggers on JDK 25, causing "cannot find symbol" errors
+            across every class that uses Lombok annotations.
+        -->
+        <lombok.version>1.18.40</lombok.version>
     </properties>
 
     <dependencies>
@@ -58,6 +66,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
             <optional>true</optional>
         </dependency>
 
@@ -84,6 +93,26 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!--
+                        As of JDK 23, javac no longer implicitly discovers
+                        annotation processors on the classpath - it must be
+                        told explicitly. Without this, Lombok can silently
+                        not run at all even with a JDK-25-compatible version
+                        installed above.
+                    -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
