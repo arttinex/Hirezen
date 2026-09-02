@@ -29,4 +29,7 @@ public class Profile {
     /** Comma-separated for now - simplest thing that works; a proper skills table is Phase 2. */
     @Column(length = 500)
     private String skills;
+
+    /** Public URL path to the uploaded photo, e.g. /uploads/profile-images/user-3-1699999999.jpg */
+    private String imageUrl;
 }

@@ -6,7 +6,7 @@
 <header class="dash-header" th:fragment="dash-header(roleLabel)">
     <span class="brand">Hirezen</span>
 
-    <nav class="app-nav">
+    <nav class="app-nav" data-app-nav>
         <a th:href="@{/dashboard}">Dashboard</a>
         <a th:href="@{/jobs}">Jobs</a>
         <a th:href="@{/gigs}">Gigs</a>
@@ -15,6 +15,11 @@
         <a th:href="@{/campus}">Campus</a>
         <a th:href="@{/zenai}">ZenAI</a>
     </nav>
+
+    <form class="header-search" th:action="@{/search}" method="get">
+        <input type="text" name="q" placeholder="Search ID, job, or company" aria-label="Search">
+        <button type="submit" aria-label="Search">&#128269;</button>
+    </form>
 
     <div class="dash-header-actions">
         <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">
@@ -45,6 +50,19 @@
         </div>
     </div>
 </header>
+
+<script>
+    (function () {
+        var path = window.location.pathname;
+        var links = document.querySelectorAll('[data-app-nav] a');
+        links.forEach(function (link) {
+            var href = link.getAttribute('href');
+            if (href === '/') return;
+            var isMatch = path === href || path.indexOf(href + '/') === 0;
+            if (isMatch) link.classList.add('active');
+        });
+    })();
+</script>
 
 </body>
 </html>

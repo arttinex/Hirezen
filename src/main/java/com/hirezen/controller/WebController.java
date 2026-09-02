@@ -2,7 +2,10 @@ package com.hirezen.controller;
 
 import com.hirezen.model.Role;
 import com.hirezen.model.StatCard;
+import com.hirezen.model.User;
+import com.hirezen.service.ApplicationService;
 import com.hirezen.service.EmailAlreadyExistsException;
+import com.hirezen.service.JobService;
 import com.hirezen.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +26,9 @@ import java.util.List;
 public class WebController {
 
     private final UserService userService;
+    private final JobService jobService;
+    private final ApplicationService applicationService;
 
-    /** Only these two roles can be picked at signup - ADMIN accounts are provisioned separately. */
     private static final Role[] SELF_REGISTERABLE_ROLES = { Role.JOB_SEEKER, Role.RECRUITER };
 
     @ModelAttribute("selfRegisterableRoles")
@@ -63,9 +67,6 @@ public class WebController {
             return "signup";
         }
 
-        // Defence in depth: even though the signup form only offers these two
-        // roles, never trust client input - reject anything else server-side
-        // (e.g. someone hand-crafting a POST with role=ADMIN).
         if (parsedRole != Role.JOB_SEEKER && parsedRole != Role.RECRUITER) {
             model.addAttribute("error", "Please choose a valid role.");
             return "signup";
@@ -82,9 +83,6 @@ public class WebController {
     }
 
     // ---------- Sign in ----------
-    // The POST /signin submission itself is handled entirely by Spring Security's
-    // formLogin filter configured in SecurityConfiguration - no controller method
-    // is needed (or should exist) for it.
 
     @GetMapping("/signin")
     public String signinPage() {
@@ -93,7 +91,6 @@ public class WebController {
 
     // ---------- Dashboards ----------
 
-    /** Generic entry point after login - sends the user to the dashboard that matches their role. */
     @GetMapping("/dashboard")
     public String dashboardRouter(Authentication authentication) {
         if (hasAuthority(authentication, Role.ADMIN)) {
@@ -105,7 +102,6 @@ public class WebController {
         if (hasAuthority(authentication, Role.JOB_SEEKER)) {
             return "redirect:/dashboard/job-seeker";
         }
-        // Should never happen - every account has exactly one of the roles above.
         log.warn("Authenticated user with no recognized role: {}", authentication.getName());
         return "redirect:/signin?error=true";
     }
@@ -113,21 +109,23 @@ public class WebController {
     @GetMapping("/dashboard/admin")
     public String adminDashboard(Model model) {
         model.addAttribute("roleLabel", "Admin");
-        model.addAttribute("stats", adminStatsPlaceholder());
+        model.addAttribute("stats", adminStats());
         return "dashboard";
     }
 
     @GetMapping("/dashboard/recruiter")
-    public String recruiterDashboard(Model model) {
+    public String recruiterDashboard(Authentication authentication, Model model) {
+        User recruiter = userService.findByEmail(authentication.getName());
         model.addAttribute("roleLabel", "Recruiter");
-        model.addAttribute("stats", recruiterStatsPlaceholder());
+        model.addAttribute("stats", recruiterStats(recruiter));
         return "dashboard";
     }
 
     @GetMapping("/dashboard/job-seeker")
-    public String jobSeekerDashboard(Model model) {
+    public String jobSeekerDashboard(Authentication authentication, Model model) {
+        User seeker = userService.findByEmail(authentication.getName());
         model.addAttribute("roleLabel", "Job Seeker");
-        model.addAttribute("stats", jobSeekerStatsPlaceholder());
+        model.addAttribute("stats", jobSeekerStats(seeker));
         return "dashboard";
     }
 
@@ -142,7 +140,6 @@ public class WebController {
         return false;
     }
 
-    /** Human-readable role label for the header/nav - shared by dashboard and every Coming Soon page. */
     private String resolveRoleLabel(Authentication authentication) {
         if (hasAuthority(authentication, Role.ADMIN)) return "Admin";
         if (hasAuthority(authentication, Role.RECRUITER)) return "Recruiter";
@@ -151,36 +148,14 @@ public class WebController {
     }
 
     // ---------- Nav placeholders ----------
-    // Every nav link must resolve to a real page - nothing disabled, nothing
-    // 404ing. These stand in for features not built yet. Jobs/Connect/Pulse/
-    // Profile get replaced with real controllers as each day's work lands;
-    // Gigs/Campus/ZenAI stay Coming Soon all the way through the demo (see
-    // the sprint plan, section 2).
-    //
-    // NOTE: /profile is now handled by ProfileController - the old
-    // profileComingSoon() method has been removed to avoid a mapping clash.
-
-    @GetMapping("/jobs")
-    public String jobsComingSoon(Authentication authentication, Model model) {
-        model.addAttribute("roleLabel", resolveRoleLabel(authentication));
-        model.addAttribute("featureName", "Jobs");
-        model.addAttribute("message", "Job posting and browsing lands here next - coming soon.");
-        return "coming-soon";
-    }
+    // /jobs -> JobController, /profile -> ProfileController, /search -> SearchController,
+    // /messages -> MessageController. Gigs/Pulse/Campus/ZenAI remain Coming Soon.
 
     @GetMapping("/gigs")
     public String gigsComingSoon(Authentication authentication, Model model) {
         model.addAttribute("roleLabel", resolveRoleLabel(authentication));
         model.addAttribute("featureName", "Gigs");
         model.addAttribute("message", "Post or browse skill-based gigs, Fiverr-style - coming soon.");
-        return "coming-soon";
-    }
-
-    @GetMapping("/messages")
-    public String connectComingSoon(Authentication authentication, Model model) {
-        model.addAttribute("roleLabel", resolveRoleLabel(authentication));
-        model.addAttribute("featureName", "Connect");
-        model.addAttribute("message", "Direct messaging between recruiters and job seekers - coming soon.");
         return "coming-soon";
     }
 
@@ -211,43 +186,37 @@ public class WebController {
     }
 
     // ---------- Dashboard stat-list builders ----------
-    // Real numbers will come from JobRepository / ApplicationRepository /
-    // NotificationRepository once those entities exist. Each method below
-    // returns the same List<StatCard> shape regardless of role, which is
-    // what lets one dashboard.html template serve all three roles - the
-    // template just loops over the list, it never needs to know which
-    // role it's rendering for.
 
-    private List<StatCard> adminStatsPlaceholder() {
+    private List<StatCard> adminStats() {
         return List.of(
-                new StatCard("Total Users", 0),
-                new StatCard("Total Job Seekers", 0),
-                new StatCard("Total Recruiters", 0),
-                new StatCard("Total Companies", 0),
-                new StatCard("Total Jobs", 0),
-                new StatCard("Total Applications", 0),
-                new StatCard("Active Jobs", 0)
+                new StatCard("Total Users", userService.totalUsersCount()),
+                new StatCard("Total Job Seekers", userService.countByRole(Role.JOB_SEEKER)),
+                new StatCard("Total Recruiters", userService.countByRole(Role.RECRUITER)),
+                new StatCard("Total Companies", jobService.distinctCompanyCount()),
+                new StatCard("Total Jobs", jobService.totalJobsCount()),
+                new StatCard("Total Applications", applicationService.totalApplicationsCount()),
+                new StatCard("Active Jobs", jobService.totalOpenJobs())
         );
     }
 
-    private List<StatCard> recruiterStatsPlaceholder() {
+    private List<StatCard> recruiterStats(User recruiter) {
         return List.of(
-                new StatCard("Total Jobs", 0),
-                new StatCard("Active Jobs", 0),
-                new StatCard("Total Applicants", 0),
-                new StatCard("Shortlisted", 0),
-                new StatCard("Rejected", 0),
-                new StatCard("Upcoming Interviews", 0)
+                new StatCard("Total Jobs", jobService.totalJobsBy(recruiter)),
+                new StatCard("Active Jobs", jobService.openJobsCountBy(recruiter)),
+                new StatCard("Total Applicants", applicationService.applicantsCountForRecruiter(recruiter)),
+                new StatCard("Shortlisted", applicationService.shortlistedCountForRecruiter(recruiter)),
+                new StatCard("Rejected", applicationService.rejectedCountForRecruiter(recruiter)),
+                new StatCard("Upcoming Interviews", 0) // not built yet - no interview scheduling feature
         );
     }
 
-    private List<StatCard> jobSeekerStatsPlaceholder() {
+    private List<StatCard> jobSeekerStats(User seeker) {
         return List.of(
-                new StatCard("Total Applications", 0),
-                new StatCard("Shortlisted", 0),
-                new StatCard("Interview Invitations", 0),
-                new StatCard("Rejected", 0),
-                new StatCard("Saved Jobs", 0)
+                new StatCard("Total Applications", applicationService.countForSeeker(seeker)),
+                new StatCard("Shortlisted", applicationService.shortlistedCountForSeeker(seeker)),
+                new StatCard("Interview Invitations", 0), // not built yet - no interview scheduling feature
+                new StatCard("Rejected", applicationService.rejectedCountForSeeker(seeker)),
+                new StatCard("Saved Jobs", 0) // not built yet - no save-for-later feature
         );
     }
 }

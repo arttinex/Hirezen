@@ -17,11 +17,18 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
+                        // Uploaded profile photos - public so <img> tags load without a session cookie issue.
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/", "/signup", "/signin").permitAll()
                         .requestMatchers("/dashboard/admin/**").hasRole("ADMIN")
                         .requestMatchers("/dashboard/recruiter/**").hasRole("RECRUITER")
                         .requestMatchers("/dashboard/job-seeker/**").hasRole("JOB_SEEKER")
                         .requestMatchers("/dashboard").authenticated()
+                        // Posting/managing jobs and viewing applicants is recruiter-only.
+                        .requestMatchers("/jobs/new", "/jobs/mine", "/jobs/*/applicants").hasRole("RECRUITER")
+                        // Applying and viewing your own applications is seeker-only.
+                        .requestMatchers("/jobs/*/apply", "/applications").hasRole("JOB_SEEKER")
+                        // Browsing (/jobs itself) stays open to any authenticated user.
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

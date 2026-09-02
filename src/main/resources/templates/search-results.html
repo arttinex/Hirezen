@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search · Hirezen</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+<div class="section-center">
+
+    <h1 th:if="${query}" th:text="'Results for \u201c' + ${query} + '\u201d'">Results</h1>
+    <h1 th:unless="${query}">Search</h1>
+
+    <div th:if="${query}" style="width:100%; max-width:720px;">
+
+        <h3>People</h3>
+        <div class="job-list" th:if="${not #lists.isEmpty(matchedUsers)}" style="margin-bottom:28px;">
+            <div class="job-card" th:each="u : ${matchedUsers}">
+                <div class="job-card-header">
+                    <h3 th:text="${u.name}">Jane Doe</h3>
+                    <span class="hirezen-id-badge" th:text="${u.hirezenId}">HZS1</span>
+                </div>
+                <p class="job-meta" th:text="${u.role}">JOB_SEEKER</p>
+                <a th:href="@{/messages/{id}(id=${u.id})}" style="display:inline-block; margin-top:6px; font-size:13px;">Message</a>
+            </div>
+        </div>
+        <p th:if="${#lists.isEmpty(matchedUsers)}" class="lead" style="margin-bottom:28px;">No people matched.</p>
+
+        <h3>Jobs</h3>
+        <div class="job-list" th:if="${not #lists.isEmpty(matchedJobs)}">
+            <div class="job-card" th:each="job : ${matchedJobs}">
+                <div class="job-card-header">
+                    <h3 th:text="${job.title}">Job Title</h3>
+                </div>
+                <p class="job-meta" th:text="${job.companyName} + ' · ' + ${job.location} + ' · ' + ${job.employmentType.label()}">
+                    Company · Location · Type
+                </p>
+            </div>
+        </div>
+        <p th:if="${#lists.isEmpty(matchedJobs)}" class="lead">No jobs matched.</p>
+
+    </div>
+
+    <p th:unless="${query}" class="lead">Enter a Hirezen ID, name, job title, or company in the search bar above.</p>
+
+</div>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

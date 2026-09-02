@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequiredArgsConstructor
@@ -38,16 +39,19 @@ public class ProfileController {
         return "profile-edit";
     }
 
-    @PostMapping("/edit")
+    @PostMapping(value = "/edit", consumes = "multipart/form-data")
     public String updateProfile(
             Authentication authentication,
+            @RequestParam String name,
             @RequestParam(required = false) String bio,
             @RequestParam(required = false) String phone,
             @RequestParam(required = false) String location,
-            @RequestParam(required = false) String skills) {
+            @RequestParam(required = false) String skills,
+            @RequestParam(required = false) MultipartFile image) {
 
         User user = userService.findByEmail(authentication.getName());
-        profileService.update(user, bio, phone, location, skills);
+        userService.updateName(user, name);
+        profileService.update(user, bio, phone, location, skills, image);
         return "redirect:/profile";
     }
 

@@ -12,13 +12,20 @@
 <div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
 
 <main class="dash-content">
-    <h1>My Profile</h1>
+<div class="section-center">
+
+    <div class="profile-header">
+        <img th:if="${profile.imageUrl}" th:src="${profile.imageUrl}" class="profile-image-large" alt="Profile photo">
+        <div th:unless="${profile.imageUrl}" class="profile-image-large profile-image-placeholder"
+             th:text="${#strings.substring(user.name, 0, 1)}">J</div>
+
+        <div>
+            <h1 style="margin:0;" th:text="${user.name}">Jane Doe</h1>
+            <span class="hirezen-id-badge" th:text="${user.hirezenId}">HZS1</span>
+        </div>
+    </div>
 
     <div class="profile-view">
-        <div class="profile-row">
-            <span class="profile-label">Name</span>
-            <span th:text="${user.name}">Jane Doe</span>
-        </div>
         <div class="profile-row">
             <span class="profile-label">Email</span>
             <span th:text="${user.email}">jane@example.com</span>
@@ -46,6 +53,8 @@
     </div>
 
     <a th:href="@{/profile/edit}" class="btn-primary" style="display:inline-block; width:auto;">Edit Profile</a>
+
+</div>
 </main>
 
 <script th:src="@{/js/app.js}"></script>

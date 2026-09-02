@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Applications · Hirezen</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+<div class="section-center">
+
+    <h1>My Applications</h1>
+
+    <a th:href="@{/jobs}" style="display:inline-block; margin-bottom:20px;">Browse more jobs</a>
+
+    <div class="job-list" th:if="${not #lists.isEmpty(applications)}">
+        <div class="job-card" th:each="app : ${applications}">
+            <div class="job-card-header">
+                <h3 th:text="${app.job.title}">Job Title</h3>
+                <span class="job-status-badge" th:classappend="'status-' + ${#strings.toLowerCase(app.status.name())}"
+                      th:text="${app.status.label()}">Applied</span>
+            </div>
+            <p class="job-meta" th:text="${app.job.companyName} + ' · ' + ${app.job.location} + ' · ' + ${app.job.employmentType.label()}">
+                Company · Location · Type
+            </p>
+            <p class="job-meta" th:text="'Applied ' + ${#temporals.format(app.appliedAt, 'MMM d, yyyy')}">
+                Applied on
+            </p>
+        </div>
+    </div>
+
+    <p th:if="${#lists.isEmpty(applications)}" class="lead">You haven't applied to any jobs yet.</p>
+
+</div>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
