@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Connect · Hirezen</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+<div class="section-center">
+
+    <h1>Connect</h1>
+
+    <div class="chat-tabs">
+        <button type="button" class="chat-tab active" data-chat-tab="primary">Primary</button>
+        <button type="button" class="chat-tab" data-chat-tab="general">General</button>
+    </div>
+
+    <div class="chat-list" data-chat-panel="primary">
+        <a class="chat-list-item" th:each="c : ${primary}" th:href="@{/messages/{id}(id=${c.partner.id})}">
+            <div class="chat-avatar" th:text="${#strings.substring(c.partner.name, 0, 1)}">J</div>
+            <div style="min-width:0;">
+                <div class="chat-list-name">
+                    <span th:text="${c.partner.name}">Name</span>
+                    <span class="hirezen-id-badge" th:text="${c.partner.hirezenId}">HZS1</span>
+                </div>
+                <div class="chat-preview" th:text="${c.lastMessage.content}">Last message preview</div>
+            </div>
+            <div class="chat-time" th:text="${#temporals.format(c.lastMessage.sentAt, 'MMM d')}">Sep 2</div>
+        </a>
+        <p th:if="${#lists.isEmpty(primary)}" class="lead">No conversations yet.</p>
+    </div>
+
+    <div class="chat-list" data-chat-panel="general" style="display:none;">
+        <a class="chat-list-item" th:each="c : ${general}" th:href="@{/messages/{id}(id=${c.partner.id})}">
+            <div class="chat-avatar" th:text="${#strings.substring(c.partner.name, 0, 1)}">J</div>
+            <div style="min-width:0;">
+                <div class="chat-list-name">
+                    <span th:text="${c.partner.name}">Name</span>
+                    <span class="hirezen-id-badge" th:text="${c.partner.hirezenId}">HZS1</span>
+                </div>
+                <div class="chat-preview" th:text="${c.lastMessage.content}">Last message preview</div>
+            </div>
+            <div class="chat-time" th:text="${#temporals.format(c.lastMessage.sentAt, 'MMM d')}">Sep 2</div>
+        </a>
+        <p th:if="${#lists.isEmpty(general)}" class="lead">Nothing here - messages that haven't been replied to yet show up in this tab.</p>
+    </div>
+
+</div>
+</main>
+
+<script>
+    (function () {
+        var tabs = document.querySelectorAll('[data-chat-tab]');
+        tabs.forEach(function (tab) {
+            tab.addEventListener('click', function () {
+                var target = tab.getAttribute('data-chat-tab');
+                document.querySelectorAll('[data-chat-tab]').forEach(function (t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                document.querySelectorAll('[data-chat-panel]').forEach(function (panel) {
+                    panel.style.display = panel.getAttribute('data-chat-panel') === target ? 'flex' : 'none';
+                });
+            });
+        });
+    })();
+</script>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

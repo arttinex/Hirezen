@@ -22,6 +22,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Public-facing ID shown across the app instead of the raw database id -
+     * e.g. HZS1 (first job seeker), HZR1 (first recruiter). Generated once at
+     * signup (see UserService#generateHirezenId) and never changed afterward.
+     */
+    @NotBlank
+    @Column(nullable = false, unique = true, updatable = false)
+    private String hirezenId;
+
     @NotBlank
     @Column(nullable = false)
     private String name;

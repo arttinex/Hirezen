@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Browse Jobs · Hirezen</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+<div class="section-center">
+
+    <h1>Browse Jobs</h1>
+
+    <a sec:authorize="hasRole('JOB_SEEKER')" th:href="@{/applications}"
+       style="display:inline-block; margin-bottom:20px;">View my applications</a>
+
+    <div class="job-list" th:if="${not #lists.isEmpty(jobs)}">
+        <div class="job-card" th:each="job : ${jobs}">
+            <div class="job-card-header">
+                <h3 th:text="${job.title}">Job Title</h3>
+            </div>
+            <p class="job-meta" th:text="${job.companyName} + ' · ' + ${job.location} + ' · ' + ${job.employmentType.label()}">
+                Company · Location · Type
+            </p>
+            <p class="job-description" th:text="${job.description}">Description</p>
+
+            <div sec:authorize="hasRole('JOB_SEEKER')" style="margin-top:14px;">
+                <span th:if="${appliedJobIds.contains(job.id)}" class="job-status-badge status-applied">Applied</span>
+                <form th:unless="${appliedJobIds.contains(job.id)}" th:action="@{/jobs/{id}/apply(id=${job.id})}" method="post">
+                    <button type="submit" class="btn-primary" style="width:auto; padding:8px 20px;">Apply</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <p th:if="${#lists.isEmpty(jobs)}" class="lead">No open jobs right now - check back soon.</p>
+
+</div>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

@@ -15,4 +15,13 @@ public enum Role {
     public String authority() {
         return "ROLE_" + name();
     }
+
+    /** Prefix used to build each user's public Hirezen ID, e.g. HZS1, HZR1, HZA1. */
+    public String idPrefix() {
+        return switch (this) {
+            case ADMIN -> "HZA";
+            case RECRUITER -> "HZR";
+            case JOB_SEEKER -> "HZS";
+        };
+    }
 }

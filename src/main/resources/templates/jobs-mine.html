@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Job Postings · Hirezen</title>
+    <th:block th:replace="~{fragments/theme-init :: init}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: dash-header(${roleLabel})}"></div>
+
+<main class="dash-content">
+<div class="section-center">
+
+    <h1>My Job Postings</h1>
+
+    <a th:href="@{/jobs/new}" class="btn-primary" style="display:inline-block; width:auto; margin-bottom:20px;">Post a new job</a>
+
+    <div class="job-list" th:if="${not #lists.isEmpty(jobs)}">
+        <div class="job-card" th:each="job : ${jobs}">
+            <div class="job-card-header">
+                <h3 th:text="${job.title}">Job Title</h3>
+                <span class="job-status-badge" th:classappend="${job.status.name() == 'OPEN'} ? 'status-open' : 'status-closed'"
+                      th:text="${job.status}">OPEN</span>
+            </div>
+            <p class="job-meta" th:text="${job.companyName} + ' · ' + ${job.location} + ' · ' + ${job.employmentType.label()}">
+                Company · Location · Type
+            </p>
+            <p class="job-description" th:text="${job.description}">Description</p>
+
+            <a th:href="@{/jobs/{id}/applicants(id=${job.id})}" style="display:inline-block; margin-top:14px; font-size:14px;">
+                View Applicants (<span th:text="${applicantCounts.get(job.id)}">0</span>)
+            </a>
+        </div>
+    </div>
+
+    <p th:if="${#lists.isEmpty(jobs)}" class="lead">You haven't posted any jobs yet.</p>
+
+</div>
+</main>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
